@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLXD Hà Ánh - Sàn bán vật liệu xây dựng chính hãng</title>
+    <!-- Nền trang chủ đề xây dựng -->
+    <style>
+        /* Reset CSS & Body Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: url('https://img4.thuthuatphanmem.vn/uploads/2019/12/16/hinh-nen-4k-thien-nhien-cuc-dep_024352152.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-color: rgba(255,255,255,0.92);
+            background-blend-mode: overlay;
+            position: relative; /* Để các phần tử popup có thể position tương đối */
+        }
+
+        /* Thanh điều hướng */
+        .navbar {
+            background: #c0392b; /* Màu đỏ sẫm */
+            padding: 0.8rem 5%; /* Giảm padding một chút */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: sticky; /* Thanh navbar luôn ở trên */
+            top: 0;
+            z-index: 1000; /* Đảm bảo hiển thị trên các phần tử khác */
+        }
+        .logo-container { display: flex; align-items: center; gap: 0.8rem; }
+        .logo-img { width: 50px; height: 50px; object-fit: contain; cursor: pointer; } /* Nhỏ hơn một chút, có thể click về home */
+        .navbar h1 { color: white; font-size: 1.6rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3); cursor: pointer; } /* Tên cửa hàng có thể click về home */
+        .nav-links a { color: white; margin-left: 1.8rem; text-decoration: none; font-size: 1.05rem; transition: all 0.3s ease; }
+        .nav-links a:hover { text-decoration: underline; opacity: 0.8; }
+
+        /* Tìm kiếm */
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: relative; /* Cho phép position popup chat */
+        }
+        .search-input {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            width: 300px; /* Chiều rộng mặc định */
+            transition: width 0.4s ease-in-out;
+        }
+        .search-input:focus { width: 400px; } /* Mở rộng khi focus */
+        .search-button {
+            padding: 0.6rem 1rem;
+            border: none;
+            background: #e74c3c; /* Màu đỏ */
+            color: white;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            margin-left: -5px; /* Kéo sát vào input */
+        }
+        .search-button:hover { background: #c0392b; }
+
+        /* Giỏ hàng và Badge */
+        .cart-icon {
+            font-size: 2rem;
+            color: white;
+            margin-left: 2rem;
+            cursor: pointer;
+            position: relative; /* Cần cho badge */
+        }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -15px;
+            background: #2ecc71; /* Màu xanh lá cây */
+            color: white;
+            border-radius: 50%;
+            padding: 3px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            min-width: 20px; /* Đảm bảo hiển thị đủ cho số 2 chữ số */
+            text-align: center;
+        }
+
+        /* Thông tin cửa hàng */
+        #store-info {
+            background: rgba(255,255,255,0.95);
+            padding: 1.5rem 5%;
+            margin: 1rem auto;
+            max-width: 1200px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #store-info h3 { color: #c0392b; margin-bottom: 1rem; font-size: 1.4rem; }
+        .store-contact {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .store-contact p { font-size: 1.05rem; color: #333; }
+        .btn { padding: 0.7rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: all 0.3s ease; }
+        .chat-with-store { background: #2980b9; color: white; }
+        .chat-with-store:hover { background: #2471a3; }
+
+        /* Danh sách sản phẩm */
+        #home {
+            padding: 2rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .product-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column; /* Sắp xếp theo chiều dọc */
+            justify-content: space-between; /* Đẩy nút "Thêm vào giỏ" xuống dưới */
+        }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img {
+            width: 100%;
+            height: 200px; /* Giảm chiều cao ảnh một chút */
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            padding: 0.8rem; /* Giảm padding */
+        }
+        .product-card h3 { color: #2c3e50; margin-bottom: 0.8rem; font-size: 1.2rem; }
+        .product-price {
+            color: #c0392b;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0.8rem 0;
+        }
+        .add-to-cart {
+            background: #27ae60; /* Màu xanh lá cây */
+            color: white;
+            width: 100%;
+            margin-top: auto; /* Đẩy nút xuống */
+        }
+        .add-to-cart:hover { background: #229954; }
+
+        /* Đánh giá sao */
+        .rating {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+        }
+        .star {
+            font-size: 1.2rem;
+            color: #f39c12; /* Màu vàng */
+            cursor: pointer;
+        }
+        .star.filled { color: #f39c12; }
+        .star.empty { color: #ccc; }
+
+        /* Phần giỏ hàng và thanh toán */
+        .cart-section, #checkout {
+            background: rgba(255,255,255,0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 900px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+        }
+        .cart-section.active, #checkout.active { display: block; }
+        .cart-section h2, #checkout h2 { color: #c0392b; margin-bottom: 1.5rem; text-align: center; }
+        #cart-list { margin-bottom: 1.5rem; }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .item-quantity {
+            width: 70px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        .remove-item { background: #e74c3c; color: white; }
+        .remove-item:hover { background: #c0392b; }
+        #total-price, #final-total {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #c0392b;
+            text-align: right;
+            margin: 1rem 0;
+        }
+        .checkout-btn, .confirm-order-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            background: #2980b9;
+            color: white;
+        }
+        .checkout-btn:hover, .confirm-order-btn:hover { background: #2471a3; }
+        .checkout-step {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px dashed #ddd;
+        }
+        .checkout-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .checkout-step h3 { color: #2c3e50; margin-bottom: 1rem; }
+        .checkout-step input[type="text"], .checkout-step select, .checkout-step input[type="tel"] {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .checkout-step input[type="radio"] { margin-right: 0.8rem; margin-bottom: 1rem; }
+
+        /* Chat Popup */
+        .chat-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001; /* Cao hơn navbar */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            background: #fff;
+            display: none; /* Ban đầu ẩn */
+            width: 350px;
+            max-width: calc(100% - 40px); /* Đảm bảo không tràn màn hình */
+        }
+        .chat-popup.open { display: flex; flex-direction: column; } /* Hiển thị khi mở */
+
+        .chat-header {
+            background: #c0392b;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer; /* Cho phép thu nhỏ */
+            border-radius: 12px 12px 0 0;
+        }
+        .chat-header h4 { font-size: 1.1rem; }
+        .chat-header .close-chat { font-size: 1.5rem; cursor: pointer; }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .chat-message {
+            padding: 0.8rem 1.2rem;
+            border-radius: 15px;
+            max-width: 75%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .chat-message.sent {
+            background: #2980b9; /* Màu xanh cho tin nhắn gửi đi */
+            color: white;
+            align-self: flex-end; /* Tin nhắn của mình bên phải */
+            border-bottom-right-radius: 3px;
+        }
+        .chat-message.received {
+            background: #e0e0e0; /* Màu xám cho tin nhắn nhận */
+            color: #333;
+            align-self: flex-start; /* Tin nhắn của người khác bên trái */
+            border-bottom-left-radius: 3px;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 0.8rem;
+            background: #fff;
+            border-top: 1px solid #eee;
+            border-radius: 0 0 12px 12px;
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 0.8rem;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            border-radius: 8px;
+            margin-right: 0.5rem;
+        }
+        .chat-send-btn {
+            background: #27ae60;
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .chat-send-btn:hover { background: #229954; }
+
+        /* Nút mở chat (biểu tượng) */
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 80px; /* Đặt phía trên popup chat */
+            right: 20px;
+            z-index: 1001;
+            background: #c0392b;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .chat-toggle-btn:hover { transform: scale(1.1); }
+        .chat-toggle-btn .cart-badge { /* Sử dụng badge cho tin nhắn chưa đọc nếu có */
+            top: 5px;
+            right: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar { padding: 0.8rem 3%; }
+            .logo-img { width: 40px; height: 40px; }
+            .navbar h1 { font-size: 1.4rem; }
+            .nav-links a { margin-left: 1rem; font-size: 0.95rem; }
+            .search-input { width: 200px; }
+            .search-input:focus { width: 300px; }
+            .cart-icon { margin-left: 1rem; font-size: 1.8rem; }
+            .cart-badge { top: -5px; right: -10px; padding: 2px 6px; font-size: 0.7rem; }
+            #store-info { padding: 1rem 3%; }
+            #home { padding: 1rem 3%; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+            .product-card { padding: 0.8rem; }
+            .product-img { height: 150px; }
+            .product-card h3 { font-size: 1.1rem; }
+            .product-price { font-size: 1.2rem; }
+            .cart-section, #checkout { padding: 1.5rem; }
+            .chat-popup { width: 90%; right: 5%; bottom: 15px; }
+            .chat-toggle-btn { bottom: 70px; right: 10px; width: 50px; height: 50px; font-size: 1.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Thanh điều hướng với logo, tìm kiếm, giỏ hàng -->
+    <nav class="navbar">
+        <div class="logo-container" onclick="window.location.href='#home'">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\ChatGPT Image 00_45_17 16 thg 4, 2026.png" alt="Logo VLXD Hà Ánh" class="logo-img">
+            <h1 onclick="window.location.href='#home'">VLXD HÀ ÁNH</h1>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Tìm kiếm sản phẩm...">
+            <button class="search-button">🔍</button>
+        </div>
+        <div class="nav-links">
+            <a href="#home" onclick="showView('home'); return false;">Trang chủ</a>
+            <a href="#cart" onclick="displayCart(); return false;">
+                Giỏ hàng <i class="fas fa-shopping-cart cart-icon"></i>
+                <span id="cart-badge" class="cart-badge">0</span>
+            </a>
+            <a href="#account">Tài khoản</a>
+        </div>
+    </nav>
+
+    <!-- Thông tin cửa hàng -->
+    <section id="store-info">
+        <h3>Thông tin Cửa hàng</h3>
+        <div class="store-contact">
+            <p><strong>Địa chỉ:</strong> Thôn Cõi, Xã Tam Dương, Tỉnh Phú Thọ</p>
+            <p><strong>Điện thoại:</strong> 0779 . 356 . 288</p>
+            <p><strong>Email:</strong> havp14022005@gmail.com</p>
+            <p><strong>Giờ làm việc:</strong> 7h30 - 18h00 Tất cả các ngày</p>
+        </div>
+        <button class="btn chat-with-store" onclick="toggleChatPopup()">Trò chuyện ngay</button>
+    </section>
+
+    <!-- Trang chủ với danh sách sản phẩm -->
+    <section id="home">
+        <!-- Sản phẩm 1: Xi măng -->
+        <div class="product-card">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\OIP.jpg" alt="Xi măng Portland VICEM" class="product-img">
+            <h3>Xi măng Portland VICEM 50kg</h3>
+            <div class="rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">☆</span><span class="star">☆</span>
+            </div>
+            <p class="product-price">120.000 VNĐ</p>
+            <button class="btn add-to-cart">Thêm vào giỏ</button>
+        </div>
+
+        <!-- Sản phẩm 2: Cát xây -->
+        <div class="product-card">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\OIP (1).jpg" alt="Cát xây loại 1" class="product-img">
+            <h3>Cát xây loại 1 (1m³)</h3>
+            <div class="rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">☆</span>
+            </div>
+            <p class="product-price">850.000 VNĐ</p>
+            <button class="btn add-to-cart">Thêm vào giỏ</button>
+        </div>
+
+        <!-- Sản phẩm 3: Gạch ống -->
+        <div class="product-card">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\so-sanh-gach-dac-va-gach-lo-2.jpg" alt="Gạch ống chuẩn" class="product-img">
+            <h3>Gạch ống chuẩn 24x11x9cm</h3>
+            <div class="rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+            </div>
+            <p class="product-price">7.500 VNĐ/chiếc</p>
+            <button class="btn add-to-cart">Thêm vào giỏ</button>
+        </div>
+
+        <!-- Sản phẩm 4: Sắt thép -->
+        <div class="product-card">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\428881875.jpg" alt="Sắt thép thanh Ø12mm" class="product-img">
+            <h3>Sắt thép thanh Ø12mm</h3>
+            <div class="rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">☆</span><span class="star">☆</span>
+            </div>
+            <p class="product-price">18.000 VNĐ/m</p>
+            <button class="btn add-to-cart">Thêm vào giỏ</button>
+        </div>
+
+        <!-- Sản phẩm 5: Gạch ốp tường -->
+        <div class="product-card">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\gach-an-do-1558.jpg" alt="Gạch ốp tường" class="product-img">
+            <h3>Gạch ốp tường ceramic 30x60cm</h3>
+            <div class="rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">☆</span>
+            </div>
+            <p class="product-price">95.000 VNĐ/chiếc</p>
+            <button class="btn add-to-cart">Thêm vào giỏ</button>
+        </div>
+
+        <!-- Sản phẩm 6: Sơn tường -->
+        <div class="product-card">
+            <img src="C:\Users\PHUNG VIET HA\OneDrive\Documents\webbanhangvlxd\tieu-chuan-chon-son-tuong.jpg" alt="Sơn tường nội thất" class="product-img">
+            <h3>Sơn tường nội thất Dulux 5 lít</h3>
+            <div class="rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+            </div>
+            <p class="product-price">450.000 VNĐ</p>
+            <button class="btn add-to-cart">Thêm vào giỏ</button>
+        </div>
+    </section>
+
+    <!-- Phần giỏ hàng -->
+    <section class="cart-section" id="cart-section">
+        <h2>Giỏ hàng của bạn</h2>
+        <div id="cart-list"></div>
+        <div id="total-price">Tổng tiền: 0 VNĐ</div>
+        <button class="btn checkout-btn" onclick="showCheckout()">Tiến hành thanh toán</button>
+    </section>
+
+    <!-- Phần thanh toán -->
+    <section id="checkout">
+        <h2>Hoàn tất đơn hàng</h2>
+        
+        <div class="checkout-step">
+            <h3>Chi tiết đơn hàng</h3>
+            <div id="order-summary"></div>
+            <div id="final-total">Tổng cộng: 0 VNĐ</div>
+        </div>
+
+        <div class="checkout-step">
+            <h3>Địa chỉ giao hàng</h3>
+            <input type="text" placeholder="Số nhà, tên đường" required>
+            <input type="text" placeholder="Phường/Xã" required>
+            <input type="text" placeholder="Quận/Huyện" required>
+            <input type="text" placeholder="Tỉnh/Thành phố" required>
+            <input type="tel" placeholder="Số điện thoại liên hệ" required>
+        </div>
+
+        <div class="checkout-step">
+            <h3>Phương thức vận chuyển</h3>
+            <select>
+                <option value="standard">Giao hàng tiêu chuẩn (3-5 ngày) - 50.000 VNĐ</option>
+                <option value="express">Giao hàng nhanh (1-2 ngày) - 100.000 VNĐ</option>
+                <option value="pickup">Nhận tại cửa hàng - Miễn phí</option>
+            </select>
+        </div>
+
+        <div class="checkout-step">
+            <h3>Phương thức thanh toán</h3>
+            <div>
+                <input type="radio" name="payment" value="cod" checked>
+                <label>Thanh toán khi nhận hàng (COD)</label>
+            </div>
+            <div>
+                <input type="radio" name="payment" value="momo">
+                <label>Thanh toán qua Ví MoMo</label>
+            </div>
+            <div>
+                <input type="radio" name="payment" value="bank">
+                <label>Chuyển khoản ngân hàng</label>
+            </div>
+        </div>
+
+        <button class="btn confirm-order-btn">Xác nhận đơn hàng</button>
+    </section>
+
+    <!-- Chat Popup -->
+    <div id="chat-popup" class="chat-popup">
+        <div class="chat-header">
+            <h4>Hỗ trợ khách hàng</h4>
+            <span class="close-chat" onclick="toggleChatPopup()">X</span>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <!-- Tin nhắn sẽ hiển thị ở đây -->
+            <div class="chat-message received">Chào bạn, tôi có thể giúp gì cho bạn?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
+            <button class="chat-send-btn" onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+    <!-- Nút mở/đóng chat -->
+    <div class="chat-toggle-btn" onclick="toggleChatPopup()">💬</div>
+
+    <!-- Thư viện Font Awesome cho icon giỏ hàng -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+        // --- State Management ---
+        let cart = [];
+        let isChatOpen = false;
+        let currentView = 'home';
+        const chatPopup = document.getElementById('chat-popup');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatToggleBtn = document.querySelector('.chat-toggle-btn');
+        const cartBadge = document.getElementById('cart-badge');
+
+        // --- Navigation & View Switching ---
+        function showView(viewName) {
+            currentView = viewName;
+            document.getElementById('home').style.display = viewName === 'home' ? 'grid' : 'none';
+            document.getElementById('cart-section').style.display = viewName === 'cart' ? 'block' : 'none';
+            document.getElementById('checkout').style.display = viewName === 'checkout' ? 'block' : 'none';
+        }
+
+        // --- Product & Cart Logic ---
+        function updateCartBadge() {
+            cartBadge.textContent = cart.length;
+            cartBadge.style.display = cart.length > 0 ? 'block' : 'none';
+        }
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                const productName = productCard.querySelector('h3').textContent;
+                const priceText = productCard.querySelector('.product-price').textContent;
+                const price = parseInt(priceText.replace(/[^0-9]/g, ''));
+                
+                cart.push({ name: productName, price: price });
+                alert(`Đã thêm "${productName}" vào giỏ hàng`);
+                updateCartBadge();
+            });
+        });
+
+        function displayCart() {
+            showView('cart');
+            const cartList = document.getElementById('cart-list');
+            const totalPrice = document.getElementById('total-price');
+            cartList.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p>Giỏ hàng của bạn đang trống</p>';
+                totalPrice.textContent = 'Tổng tiền: 0 VNĐ';
+                updateCartBadge();
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                const itemHTML = `
+                    <div class="cart-item" data-index="${index}">
+                        <span>${item.name}</span>
+                        <span>${item.price.toLocaleString('vi-VN')} VNĐ</span>
+                        <input type="number" min="1" value="1" class="item-quantity" data-index="${index}" onchange="updateItemQuantity(${index}, this.value)">
+                        <button class="btn remove-item" data-index="${index}">Xóa</button>
+                    </div>
+                `;
+                cartList.innerHTML += itemHTML;
+                total += item.price; // Tính tổng đơn giản (chưa nhân số lượng)
+            });
+
+            totalPrice.textContent = `Tổng tiền: ${total.toLocaleString('vi-VN')} VNĐ`;
+            addCartEvents();
+            updateCartBadge();
+        }
+
+        function updateItemQuantity(index, quantity) {
+            const newQuantity = parseInt(quantity);
+            if (newQuantity > 0) {
+                // Trong ứng dụng thực tế, bạn cần cập nhật giá trị item trong mảng cart
+                // và tính toán lại tổng tiền dựa trên số lượng.
+                // Ví dụ: cart[index].quantity = newQuantity;
+                alert("Chức năng cập nhật số lượng đang được phát triển.");
+            }
+            displayCart(); // Cập nhật lại hiển thị giỏ hàng
+        }
+
+        function addCartEvents() {
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    cart.splice(index, 1);
+                    displayCart();
+                });
+            });
+        }
+
+        function showCheckout() {
+            if (cart.length === 0) {
+                alert('Giỏ hàng của bạn đang trống!');
+                return;
+            }
+            showView('checkout');
+            
+            const orderSummary = document.getElementById('order-summary');
+            const finalTotal = document.getElementById('final-total');
+            let total = 0;
+            orderSummary.innerHTML = '';
+
+            cart.forEach(item => {
+                orderSummary.innerHTML += `<p>${item.name} - ${item.price.toLocaleString('vi-VN')} VNĐ</p>`;
+                total += item.price;
+            });
+
+            finalTotal.textContent = `Tổng cộng: ${total.toLocaleString('vi-VN')} VNĐ`;
+        }
+
+        // --- Chat Popup Logic ---
+        function toggleChatPopup() {
+            isChatOpen = !isChatOpen;
+            chatPopup.style.display = isChatOpen ? 'flex' : 'none';
+            chatToggleBtn.style.display = isChatOpen ? 'none' : 'flex'; // Ẩn nút toggle khi popup mở
+            if (isChatOpen) {
+                chatInput.focus();
+            }
+        }
+
+        function sendMessage() {
+            const messageText = chatInput.value.trim();
+            if (messageText === '') return;
+
+            const newMessage = document.createElement('div');
+            newMessage.classList.add('chat-message', 'sent');
+            newMessage.textContent = messageText;
+            chatMessages.appendChild(newMessage);
+
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Cuộn xuống cuối
+
+            // Simulate a response after a delay
+            setTimeout(receiveMessage, 1000, "Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất có thể.");
+        }
+
+        function receiveMessage(text) {
+            const newMessage = document.createElement('div');
+            newMessage.classList.add('chat-message', 'received');
+            newMessage.textContent = text;
+            chatMessages.appendChild(newMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showView('home'); // Hiển thị trang chủ ban đầu
+            updateCartBadge(); // Cập nhật badge giỏ hàng khi tải trang
+            // Load initial rating stars (example)
+            document.querySelectorAll('.star').forEach(star => {
+                star.onclick = function() {
+                    const ratingContainer = this.parentNode;
+                    const rating = this.dataset.rating;
+                    const stars = ratingContainer.querySelectorAll('.star');
+                    stars.forEach((s, index) => {
+                        if (index < this.dataset.rating) {
+                            s.classList.add('filled');
+                            s.classList.remove('empty');
+                        } else {
+                            s.classList.remove('filled');
+                            s.classList.add('empty');
+                        }
+                    });
+                };
+                // Assign rating values to stars for interaction
+                let ratingValue = 1;
+                this.parentNode.querySelectorAll('.star').forEach(s => {
+                    s.dataset.rating = ratingValue++;
+                    if (s.classList.contains('filled')) {
+                        s.style.cursor = 'pointer';
+                    } else {
+                        s.style.cursor = 'pointer';
+                    }
+                });
+            });
+        });
+
+        // Handle clicking on logo/title to go home
+        document.querySelector('.logo-container').addEventListener('click', () => showView('home'));
+        document.querySelector('.navbar h1').addEventListener('click', () => showView('home'));
+
+        // Add Font Awesome for stars if needed (using inline span is simpler here)
+        // If you want interactive stars, you'd need more JS.
+    </script>
+</body>
+</html>
